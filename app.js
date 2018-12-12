@@ -13,15 +13,11 @@ app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
-/*
-  The next app.use() handles CORS manually by:
-    -appending the headers to every response we sent back
-  it's probably a good idea to use a package like https://github.com/expressjs/cors to take care of it.
-
-*/ 
+// The next app.use() handles CORS manually by appending the headers to every response we sent back
+// it's probably a good idea to use a package like https://github.com/expressjs/cors to take care of it.
 app.use((req, res, next)=>{
-  // res.header('Access-Control-Allow-Origin', 'http://my-cool-page.com'); <-- This insures that only my-cool-page.com can is allowed excluded to CORS
-  res.header('Access-Control-Allow-Origin', '*');
+  // res.header('Access-Control-Allow-Origin', 'http://my-cool-page.com'); <-- This insures that only my-cool-page.com can is excluded to CORS
+  res.header('Access-Control-Allow-Origin', '*'); //the '*' allows all pages to use our API
   //next we difine which headers we allow to accept
   res.header(
     'Access-Control-Allow-Headers',
