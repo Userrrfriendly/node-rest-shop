@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const morgan = require('morgan'); //HTTP request logger middleware for node.js
+const morgan = require('morgan'); //HTTP request logger middleware for node.js (eg it logs the GET/POST/etc request in the console as the app runs)
 
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
@@ -27,5 +27,6 @@ app.use((error, req, res, next)=>{
       message: error.message
     }
   });
-})
+});
+
 module.exports = app;
