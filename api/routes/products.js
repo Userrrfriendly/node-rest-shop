@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-//Remember the '/' below equals ==> '/products/'
+//Remember the '/' below refers to the URI ==> '/products/'
 router.get('/', (req, res, next)=>{
   res.status(200).json({
     message: 'Handling GET requests to /products'
