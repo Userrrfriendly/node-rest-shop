@@ -2,10 +2,16 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan'); //HTTP request logger middleware for node.js (eg it logs the GET/POST/etc request in the console as the app runs)
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 
+/*process.env.MONGO_ATLAS_PW (along with any other environment variables) is set in the nodemon.json
+  in the initial tutorial mongoose.connect was passed a second argument that was removed because its outdated?--> {useMongoClient: true}
+  instead { useNewUrlParser: true } needs to be passed, otherwise node throws error
+*/
+mongoose.connect('mongodb+srv://admin:' + process.env.MONGO_ATLAS_PW + '@cluster0-xbv2u.mongodb.net/test?retryWrites=true', { useNewUrlParser: true })
 //since morgan 'wraps' all our requests it will be declared(and exectued) first
 app.use(morgan('dev'));
 //we should set extended to either true or false, true allows you to parse Extended bodies with rich data in it 
@@ -18,7 +24,7 @@ app.use(bodyParser.json());
 app.use((req, res, next)=>{
   // res.header('Access-Control-Allow-Origin', 'http://my-cool-page.com'); <-- This insures that only my-cool-page.com can is excluded to CORS
   res.header('Access-Control-Allow-Origin', '*'); //the '*' allows all pages to use our API
-  //next we difine which headers we allow to accept
+  //difine which headers we allow to accept
   res.header(
     'Access-Control-Allow-Headers',
     'Origin, X-Requested-With, Content-Type, Accept, Authorization'
