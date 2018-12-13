@@ -12,6 +12,12 @@ const orderRoutes = require('./api/routes/orders');
   instead { useNewUrlParser: true } needs to be passed, otherwise node throws error
 */
 mongoose.connect('mongodb+srv://admin:' + process.env.MONGO_ATLAS_PW + '@cluster0-xbv2u.mongodb.net/test?retryWrites=true', { useNewUrlParser: true })
+/*In the older versions of mongoose we should include the following line of code after mongoose.connect();
+mongoose.Promise = global.Promise
+this ensured that a mongoose promise turned into a real promise... it seems that the current version of mongoose
+doesn't need this so it was ommited
+ */
+
 //since morgan 'wraps' all our requests it will be declared(and exectued) first
 app.use(morgan('dev'));
 //we should set extended to either true or false, true allows you to parse Extended bodies with rich data in it 

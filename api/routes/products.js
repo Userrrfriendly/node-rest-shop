@@ -7,11 +7,28 @@ const Product = require('../models/product');
 //Remember the '/' below refers to the URI --> '/products/'
 router.get('/', (req, res, next)=>{
 //chain .exec() to make a Promise that is chainable
+//in select you either pass the names of the props you want returned 
+//OR the names of the props you don't want to show prefixed by minus - 
+//so both .select('-__v') && .select('name price _id') will yield the same results
   Product.find()
+    .select('-__v')
     .exec()
-    .then(docs=>{
-      console.log(docs);
-      res.status(200).json(docs);
+    .then(docs=> {
+      const response = {
+        count: docs.length,
+        products: docs.map(doc=> {
+          return {
+            name: doc.name,
+            price: doc.price,
+            _id: doc.id,
+            request: {
+              type: 'GET',
+              url: 'http://localhost:3000/products/' + doc._id
+            }
+          }
+        })
+      }
+      res.status(200).json(response);
     })
     .catch(err=>{
       console.log(err);
@@ -33,8 +50,16 @@ router.post('/', (req, res, next)=>{
   .then(result => {
     console.log(result);
     res.status(201).json({
-      message: 'Handling POST requests to /products',
-      createdProduct: result
+      message: 'Created product successfully',
+      createdProduct: {
+        name: result.name,
+        price: result.price,
+        _id: result._id,
+        request: {
+          type: 'GET',
+          url: 'http://localhost:3000/products/' + result._id
+        }
+      }
     });
   })
   .catch(err=> {
@@ -48,6 +73,7 @@ router.post('/', (req, res, next)=>{
 router.get('/:productId', (req, res, next)=>{
   const id = req.params.productId;
   Product.findById(id)
+    .select('-__v')
     .exec()
     .then(doc=> {
       console.log(`..fetching from the Cloud Database ${doc}`);
@@ -89,8 +115,13 @@ router.patch('/:productId', (req, res, next)=>{
   Product.update({ _id: id }, { $set: updateOps })
   .exec()
   .then(result=> {
-    console.log(result);
-    res.status(200).json(result);
+    res.status(200).json({
+      message: 'Product Updated',
+      request: {
+        type: 'GET',
+        url: 'http://localhost:3000/products/' + id
+      }
+    });
   })
   .catch(err=> {
     console.log(err);
