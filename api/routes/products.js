@@ -6,10 +6,16 @@ const Product = require('../models/product');
 
 //Remember the '/' below refers to the URI --> '/products/'
 router.get('/', (req, res, next)=>{
-//chain .exec() to make a Promise that is chainable
-//in select you either pass the names of the props you want returned 
-//OR the names of the props you don't want to show prefixed by minus - 
-//so both .select('-__v') && .select('name price _id') will yield the same results
+  /**
+    Since mongoose querries return a promise-like obj (mongoose promises can use .then() but can't use .catch() 
+    (The exception is .save() method that returns a normal Promise)
+    chain .exec() to make mongoose promise into a real promise (save())
+      - Check the documentation cause this issue could be fixed by now
+    in .select() you either pass the names of the props you want returned 
+    OR the names of the props you don't want to return by prefixing them with a minus - 
+    so both .select('-__v') && .select('name price _id') will yield the same results
+   */
+
   Product.find()
     .select('-__v')
     .exec()
