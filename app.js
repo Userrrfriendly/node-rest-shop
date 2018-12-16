@@ -13,7 +13,7 @@ const orderRoutes = require('./api/routes/orders');
 */
 mongoose.connect('mongodb+srv://admin:' + process.env.MONGO_ATLAS_PW + '@cluster0-xbv2u.mongodb.net/test?retryWrites=true', { useNewUrlParser: true })
 /*In the older versions of mongoose we should include the following line of code after mongoose.connect();
-mongoose.Promise = global.Promise
+    mongoose.Promise = global.Promise
 this ensured that a mongoose promise turned into a real promise... it seems that the current version of mongoose
 doesn't need this so it was ommited
  */
