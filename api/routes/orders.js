@@ -7,8 +7,14 @@ const Product = require('../models/product');
 
 //Remember the '/' below refers to the URI ==> '/orders/'
 router.get('/', (req, res, next)=>{
+  /*By using the .populate() method before the .exec() we can populate a property with data referenced from elsewhere
+    *First argument in populate is the name of the property we want to populate. The 'product' that we pass can be found at its schema aka at order.js
+    *By passing the second optional argument we can select which properties we want to display - just like the .select() method
+    *more on .populate() --> https://mongoosejs.com/docs/populate.html
+  */
   Order.find()
     .select('-__v')
+    .populate('product', '-__v')
     .exec()
     .then(docs => {
       res.status(200).json({
@@ -44,7 +50,11 @@ router.post("/", (req, res, next) => {
     If the ObjectId is valid checks if it exists in the database before creating the order
     If the ObjectId is valid but doesnt exist in our DB the response returns 404 (as intended)
     but the console floods with errors... Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client ....
-    need to consult with oracle to see if its ok to proceed
+    possible cause: but the issue was his error handling in my case. 
+      When we checked whether or not something exists we return res.status when we should actually throw it to the catch block.
+      We're sending a response instead of allowing the catch block to send a response. 
+      Example: if (!doc) { res.status(404).json({ message: "Product not found" }) } 
+      Should be: if (!doc) { throw "Product not found"; } 
   */  
   Product.findById(req.body.productId)
     .exec()
@@ -87,6 +97,7 @@ router.post("/", (req, res, next) => {
 
 router.get('/:orderId', (req, res, next)=>{
   Order.findById(req.params.orderId)
+    .populate('product', '-__v')
     .exec()
     .then(order=> {
       if (!order) {
