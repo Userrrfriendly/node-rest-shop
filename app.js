@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
-
+const userRoutes = require('./api/routes/users');
 /*process.env.MONGO_ATLAS_PW (along with any other environment variables) is set in the nodemon.json
   in the initial tutorial mongoose.connect was passed a second argument that was removed because its outdated?--> {useMongoClient: true}
   instead { useNewUrlParser: true } needs to be passed, otherwise node throws error
@@ -17,7 +17,9 @@ mongoose.connect('mongodb+srv://admin:' + process.env.MONGO_ATLAS_PW + '@cluster
 this ensured that a mongoose promise turned into a real promise... it seems that the current version of mongoose
 doesn't need this so it was ommited
  */
-
+//no clue what mongoose.set('useCreateIndex', true);  does but it removes the WARNING in the console (for more look at User Model)
+//that is thrown once the User schema gets a unique: true checked in the email property
+mongoose.set('useCreateIndex', true);
 //since morgan 'wraps' all our requests it will be declared(and exectued) first
 app.use(morgan('dev'));
 //makes a folder publicly availiable (static).The first arguments tells express to parse only requests that target '/uploads'
@@ -50,6 +52,7 @@ app.use((req, res, next)=>{
 //every url requst starting with /products will be handled by productRoutes
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+app.use('/user', userRoutes);
 
 //handling Errors
 app.use((req, res, next)=>{
