@@ -5,7 +5,8 @@ const productSchema = mongoose.Schema({
   // mongoose.Schema.Types.ObjectId is of specific format Mongoose uses internally
   _id: mongoose.Schema.Types.ObjectId,
   name: {type: String, required: true },
-  price: {type: Number, required: true }
+  price: {type: Number, required: true },
+  productImage: {type: String, required: true } //type is String cause it's just a URL that will be stored in our mongoDB
 });
 
 /*export the schema wrapped into a model

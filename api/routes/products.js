@@ -1,8 +1,41 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+//Multer is a a middleware similar to body parser but it is able to parse form data bodies, more: https://github.com/expressjs/multer
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  //destination defines where the incoming file will be stored
+  destination: (req, file, cb)=> {
+    //first argument in cb(null,...) is used for an error object, the second is the path
+    cb(null, './uploads/');
+  },
+  //filename defines how the file will be named
+  filename: (req,file,cb)=>{
+    cb(null, Date.now() + file.originalname);
+  }
+});
+//
+const fileFilter = (req,file,cb) => {
+  //minetype is automatically populated by multer
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    cb(null, true); //save file
+  } else {
+    cb(null, false); //don't save the file
+  }
+};
+//we pass a configuration object to multer that specifies a folder were multer will try to store all the incoming files
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5 //Accepts files less than 5Megabytes
+  },
+  //fileFilter (defined above) will filter the incomming files and stoer only jpeg && png files
+  fileFilter: fileFilter
+});
 
 const Product = require('../models/product');
+
 
 //Remember the '/' below refers to the URI --> '/products/'
 router.get('/', (req, res, next)=>{
@@ -27,6 +60,7 @@ router.get('/', (req, res, next)=>{
             name: doc.name,
             price: doc.price,
             _id: doc.id,
+            productImage: doc.productImage,
             request: {
               type: 'GET',
               url: 'http://localhost:3000/products/' + doc._id
@@ -44,12 +78,24 @@ router.get('/', (req, res, next)=>{
     });
 });
 
-router.post('/', (req, res, next)=>{
-  //req.body is availiable because of body-parser middleware
+/*an argument can be passed into a function prior to the incoming request, 
+  you can pass as many handlers as you want and each works as a middleware, 
+  the upload() created above gives us access to some of that middleware.
+  upload.single() means that we will get and parse ONE file,
+  we need to specify the field that will hold the file
+*/
+router.post('/', upload.single('productImage'), (req, res, next)=>{
+  //req.file is beeing availiabvle because of the multer (upload.singe()) middleware
+  //One more thing that multer does is provide us the req.body 
+  //(we make the post request as form-data and pass the params as key,value pairs name=tulips&price=14 or something like that )
+  console.log(req.file);
+
   const product = new Product({
+    //req.body is availiable because of body-parser middleware
     _id: new mongoose.Types.ObjectId(),
     name: req.body.name,
-    price: req.body.price
+    price: req.body.price,
+    productImage: req.file.path
   });
   //save the created product in the database with .save()
   product.save()
@@ -86,6 +132,7 @@ router.get('/:productId', (req, res, next)=>{
           _id: doc._id,
           name: doc.name,
           price: doc.price,
+          productImage: doc.productImage,
           request: {
             type: 'GET',
             description: 'GET all products',

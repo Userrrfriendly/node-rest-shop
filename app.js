@@ -20,6 +20,9 @@ doesn't need this so it was ommited
 
 //since morgan 'wraps' all our requests it will be declared(and exectued) first
 app.use(morgan('dev'));
+//makes a folder publicly availiable (static).The first arguments tells express to parse only requests that target '/uploads'
+// that way the product image can be displayed in the browser at http://localhost:3000/<productImage> 
+app.use('/uploads', express.static('uploads'));
 //we should set extended to either true or false, true allows you to parse Extended bodies with rich data in it 
 //I will set it to false to only support simple bodies for URL encoded data 
 app.use(bodyParser.urlencoded({extended:false}));
